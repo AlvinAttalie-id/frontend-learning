@@ -1,19 +1,16 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createUser, updateUser } from "../api/reqres";
+import { toast } from "react-toastify";
 
-export default function UserForm({
-  selectedUser,
-  onSuccess,
-  onAddUser,
-  onUpdateUser,
-}) {
+export default function UserForm({ selectedUser, onSuccess }) {
   const [name, setName] = useState("");
   const [job, setJob] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (selectedUser) {
       setName(`${selectedUser.first_name} ${selectedUser.last_name}`);
-      setJob(selectedUser.job || "");
+      setJob("Developer");
     } else {
       setName("");
       setJob("");
@@ -22,46 +19,23 @@ export default function UserForm({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!name) {
-      alert("Nama lengkap harus diisi");
-      return;
-    }
-
-    if (selectedUser) {
-      try {
-        const updated = await updateUser(selectedUser.id, { name, job });
-        onUpdateUser({
-          ...selectedUser,
-          first_name: name.split(" ")[0],
-          last_name: name.split(" ").slice(1).join(" "),
-          job,
-          ...updated,
-        });
-        onSuccess();
-      } catch {
-        alert("Gagal mengupdate user");
+    setLoading(true);
+    try {
+      if (selectedUser) {
+        await updateUser(selectedUser.id, { name, job });
+        toast.success("User berhasil diupdate.");
+      } else {
+        await createUser({ name, job });
+        toast.success("User berhasil ditambahkan.");
       }
-    } else {
-      try {
-        const created = await createUser({ name, job });
-        const newUser = {
-          id: created.id || Math.random().toString(36).slice(2, 9),
-          first_name: name.split(" ")[0],
-          last_name: name.split(" ").slice(1).join(" "),
-          job,
-          avatar: "https://via.placeholder.com/150",
-          email: "", // bisa ditambah input email kalau mau
-        };
-        onAddUser(newUser);
-        onSuccess();
-      } catch {
-        alert("Gagal menambah user");
-      }
+      onSuccess();
+      setName("");
+      setJob("");
+    } catch (err) {
+      toast.error(err.error || "Gagal menyimpan user.");
+    } finally {
+      setLoading(false);
     }
-
-    setName("");
-    setJob("");
   };
 
   return (
@@ -82,9 +56,14 @@ export default function UserForm({
           placeholder="Pekerjaan"
           value={job}
           onChange={(e) => setJob(e.target.value)}
+          required
         />
-        <button className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-          {selectedUser ? "Update" : "Tambah"}
+        <button
+          type="submit"
+          className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+          disabled={loading}
+        >
+          {loading ? "Memproses..." : selectedUser ? "Update" : "Tambah"}
         </button>
       </form>
     </div>

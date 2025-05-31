@@ -14,7 +14,7 @@ export default function LoginForm({ onLogin }) {
     try {
       const res = await login(email, password);
       localStorage.setItem("token", res.token);
-      onLogin();  // beri tahu App kalau login berhasil
+      onLogin(); 
       navigate("/dashboard");
     } catch (err) {
       setError("Login gagal. Periksa email/password.");

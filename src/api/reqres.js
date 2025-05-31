@@ -1,15 +1,13 @@
-// File: src/api/reqres.js
 import axios from "axios";
 
 const api = axios.create({
   baseURL: "https://reqres.in/api",
   headers: {
     "Content-Type": "application/json",
-    "x-api-key": "reqres-free-v1",
+    "x-api-key": "reqres-free-v1", 
   },
 });
 
-// REGISTER
 export const register = async (email, password) => {
   try {
     const response = await api.post("/register", { email, password });
@@ -19,7 +17,6 @@ export const register = async (email, password) => {
   }
 };
 
-// LOGIN
 export const login = async (email, password) => {
   try {
     const response = await api.post("/login", { email, password });
@@ -29,7 +26,6 @@ export const login = async (email, password) => {
   }
 };
 
-// GET USERS
 export const getUsers = async (page = 1) => {
   try {
     const response = await api.get(`/users?page=${page}`);
@@ -39,17 +35,6 @@ export const getUsers = async (page = 1) => {
   }
 };
 
-// GET SINGLE USER
-export const getUser = async (id) => {
-  try {
-    const response = await api.get(`/users/${id}`);
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || { error: "Gagal mengambil user." };
-  }
-};
-
-// CREATE USER
 export const createUser = async (user) => {
   try {
     const response = await api.post("/users", user);
@@ -59,7 +44,6 @@ export const createUser = async (user) => {
   }
 };
 
-// UPDATE USER
 export const updateUser = async (id, user) => {
   try {
     const response = await api.put(`/users/${id}`, user);
@@ -69,7 +53,6 @@ export const updateUser = async (id, user) => {
   }
 };
 
-// DELETE USER
 export const deleteUser = async (id) => {
   try {
     const response = await api.delete(`/users/${id}`);
